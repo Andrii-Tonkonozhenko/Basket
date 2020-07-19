@@ -1,35 +1,36 @@
 <?php
 
+require 'Product.php';
+require 'Exception.php';
+
 class Basket
 {
     private $products = [];
-    private $totalCost = 0;
 
     private function tax(): float
     {
-        return $this->totalCost * (10 / 100);
+        return $this->setTotalCost() * (10 / 100);
     }
 
-    private function setTotalSum($sum): void
+    private function setTotalCost(): float
     {
-        $this->totalCost = $sum;
+        $totalCost = 0;
+        foreach ($this->products as $product) {
+            $totalCost += $product['product']->getPrice() * $product['qty'];
+        }
+        return $totalCost;
     }
 
-    private function ProductSum($id): float
+    private function productSum(): float
     {
         foreach ($this->products as $product) {
-            if ($product['product']->getId() === $id) {
-                $sum = $product['product']->getPrice() * $product['qty'];
-                $this->setTotalSum($sum);
-                var_dump($product['qty']);
-                return $sum;
-            }
+            return $product['product']->getPrice() * $product['qty'];
         }
     }
 
-    private function ToPay(): float
+    private function toPay(): float
     {
-        return $this->totalCost - $this->tax();
+        return $this->setTotalCost() - $this->tax();
     }
 
     public function addProductToBasket(Product $product, int $qty): void
@@ -37,15 +38,20 @@ class Basket
         $this->products[$product->getId()] = ['product' => $product, 'qty' => $qty];
     }
 
-    public function updateQty(Product $product, int $newQty): void
+    public function updateQty(int $id, int $newQty): void
     {
-        foreach ($this->products as $products) {
-            if ($products['product']->getId() === $product->getId()) {
-//                $this->products['qty'] = $newQty;
-//                $this->products['qty'] = $products['qty'] = $newQty;
-               $products['qty'] = $newQty;
-            }
+        if (!isset($this->products[$id])) {
+            throw new ThisProductIsNotInBasket();
         }
+        $this->products[$id]['qty'] = $newQty;
+    }
+
+    public function removeProductInBasket(int $id): void
+    {
+        if (!isset($this->products[$id])) {
+            throw new ThisProductIsNotInBasket();
+        }
+        unset($this->products[$id]);
     }
 
     public function check()
@@ -55,43 +61,14 @@ class Basket
         echo '-----Products-----' . '</br>';
 
         foreach ($this->products as $product) {
-            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->ProductSum($product['product']->getId()) . '$' . '</br>';
+            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->productSum() . '$' . '</br>';
         }
 
-        echo '</br>' . 'Total cost: ' . $this->totalCost . '$' . '</br>';
+        echo '</br>' . 'Total cost: ' . $this->setTotalCost() . '$' . '</br>';
         echo 'Tax: ' . $this->tax() . '$' . '</br>';
         echo 'To pay: ' . $this->ToPay() . '$' . '</br>';
     }
 
-}
-
-class Product
-{
-    public $id;
-    private $title;
-    private $price;
-
-    public function __construct(int $id, string $title, float $price)
-    {
-        $this->id = $id;
-        $this->title = $title;
-        $this->price = $price;
-    }
-
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
 }
 
 $basket = new Basket();
@@ -99,10 +76,14 @@ $basket = new Basket();
 $milk = new Product(1, 'Milk', 1.4);
 $bread = new Product(2, 'Bread', 2.4);
 $meat = new Product(3, 'Meat', 15.5);
+try {
+    $basket->addProductToBasket($milk, 2);
+    $basket->addProductToBasket($bread, 5);
+    $basket->addProductToBasket($meat, 2);
+    $basket->updateQty(1, 7);
+    $basket->removeProductInBasket(3);
 
-$basket->addProductToBasket($milk, 2);
-$basket->addProductToBasket($bread, 5);
-$basket->updateQty($milk, 7);
-
-$basket->check();
-
+    $basket->check();
+} catch (BasketException $e) {
+    die($e->getMessage());
+}
