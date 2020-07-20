@@ -9,10 +9,10 @@ class Basket
 
     private function tax(): float
     {
-        return $this->setTotalCost() * (10 / 100);
+        return $this->getTotalCost() * (10 / 100);
     }
 
-    private function setTotalCost(): float
+    private function getTotalCost(): float
     {
         $totalCost = 0;
         foreach ($this->products as $product) {
@@ -21,19 +21,21 @@ class Basket
         return $totalCost;
     }
 
-    private function productSum(): float
+    private function getProductSum(int $id): float
     {
         foreach ($this->products as $product) {
-            return $product['product']->getPrice() * $product['qty'];
+            if ($product['product']->getId() === $id) {
+                return $product['product']->getPrice() * $product['qty'];
+            }
         }
     }
 
     private function toPay(): float
     {
-        return $this->setTotalCost() - $this->tax();
+        return $this->getTotalCost() - $this->tax();
     }
 
-    public function addProductToBasket(Product $product, int $qty): void
+    public function addProduct(Product $product, int $qty): void
     {
         $this->products[$product->getId()] = ['product' => $product, 'qty' => $qty];
     }
@@ -46,7 +48,7 @@ class Basket
         $this->products[$id]['qty'] = $newQty;
     }
 
-    public function removeProductInBasket(int $id): void
+    public function removeProduct (int $id): void
     {
         if (!isset($this->products[$id])) {
             throw new ThisProductIsNotInBasket();
@@ -61,10 +63,10 @@ class Basket
         echo '-----Products-----' . '</br>';
 
         foreach ($this->products as $product) {
-            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->productSum() . '$' . '</br>';
+            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->getProductSum($product['product']->getId()) . '$' . '</br>';
         }
 
-        echo '</br>' . 'Total cost: ' . $this->setTotalCost() . '$' . '</br>';
+        echo '</br>' . 'Total cost: ' . $this->getTotalCost() . '$' . '</br>';
         echo 'Tax: ' . $this->tax() . '$' . '</br>';
         echo 'To pay: ' . $this->ToPay() . '$' . '</br>';
     }
@@ -77,11 +79,11 @@ $milk = new Product(1, 'Milk', 1.4);
 $bread = new Product(2, 'Bread', 2.4);
 $meat = new Product(3, 'Meat', 15.5);
 try {
-    $basket->addProductToBasket($milk, 2);
-    $basket->addProductToBasket($bread, 5);
-    $basket->addProductToBasket($meat, 2);
-    $basket->updateQty(1, 7);
-    $basket->removeProductInBasket(3);
+    $basket->addProduct($milk, 2);
+    $basket->addProduct($bread, 5);
+    $basket->addProduct($meat, 2);
+    $basket->updateQty(1, 6);
+    $basket->removeProduct(3);
 
     $basket->check();
 } catch (BasketException $e) {
