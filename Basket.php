@@ -2,6 +2,7 @@
 
 require 'Product.php';
 require 'Exception.php';
+require 'OutputType.php';
 
 class Basket
 {
@@ -56,19 +57,19 @@ class Basket
         unset($this->products[$id]);
     }
 
-    public function check()
+    public function check($type)
     {
-        echo '-----Check-----' . '</br>';
-        echo 'Date: ' . (date("dS of F  h:I:s A ")) . '</br>';
-        echo '-----Products-----' . '</br>';
+        echo '-----Check-----' . $type;
+        echo 'Date: ' . (date("dS of F  h:I:s A ")) . $type;
+        echo '-----Products-----' . $type;
 
         foreach ($this->products as $product) {
-            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->getProductSum($product['product']->getId()) . '$' . '</br>';
+            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->getProductSum($product['product']->getId()) . '$' . $type;
         }
 
-        echo '</br>' . 'Total cost: ' . $this->getTotalCost() . '$' . '</br>';
-        echo 'Tax: ' . $this->tax() . '$' . '</br>';
-        echo 'To pay: ' . $this->ToPay() . '$' . '</br>';
+        echo $type . 'Total cost: ' . $this->getTotalCost() . '$' . $type;
+        echo 'Tax: ' . $this->tax() . '$' . $type;
+        echo 'To pay: ' . $this->ToPay() . '$' . $type;
     }
 
 }
@@ -78,6 +79,8 @@ $basket = new Basket();
 $milk = new Product(1, 'Milk', 1.4);
 $bread = new Product(2, 'Bread', 2.4);
 $meat = new Product(3, 'Meat', 15.5);
+
+$outputType = new OutputType();
 try {
     $basket->addProduct($milk, 2);
     $basket->addProduct($bread, 5);
@@ -85,7 +88,7 @@ try {
     $basket->updateQty(1, 6);
     $basket->removeProduct(3);
 
-    $basket->check();
+    $basket->check($outputType->getOutputBrowser());
 } catch (BasketException $e) {
     die($e->getMessage());
 }
