@@ -25,6 +25,7 @@ class Cart
         foreach ($this->products as $product) {
             $totalCost += $product['product']->getPrice() * $product['qty'];
         }
+
         return $totalCost;
     }
 
