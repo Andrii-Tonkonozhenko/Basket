@@ -1,15 +1,15 @@
 <?php
 
-interface OutputType
+interface CheckView
 {
     public function render($type): void;
 }
 
-class HtmlCheckPrinter implements OutputType
+class HtmlCheckPrinter implements CheckView
 {
     public function render($data): void
     {
-        echo '-----Check-----' . '</br>';
+        echo '-----Check-----' . '</br>'; //"сам додумаєшся, чому я це заскрінив" провіряй додумався
         echo 'Date: ' . (date("dS of F  h:I:s A ")) . '</br>';
         echo '-----Products-----' . '</br>';
 
@@ -23,7 +23,7 @@ class HtmlCheckPrinter implements OutputType
     }
 }
 
-class ConsoleCheckPrinter implements OutputType
+class ConsoleCheckPrinter implements CheckView
 {
     public function render($data): void
     {

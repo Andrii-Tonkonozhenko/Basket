@@ -9,6 +9,10 @@ class Cart
     private $products = [];
     private $checkView;
 
+    public function __construct(CheckView $checkView)
+    {
+        $this->checkView = $checkView;
+    }
 
     private function tax(): float
     {
@@ -26,11 +30,10 @@ class Cart
 
     private function getProductSum(int $id): float
     {
-        foreach ($this->products as $product) {
-            if ($product['product']->getId() === $id) {
-                return $product['product']->getPrice() * $product['qty'];
-            }
+        if (!isset($this->products[$id])) {
+            throw new ThisProductIsNotInCart(); //це можна видалити *цензура*, воно ж ніфіга не дає
         }
+        return $this->products[$id]['product']->getPrice() * $this->products[$id]['qty'];
     }
 
     private function toPay(): float
@@ -38,10 +41,6 @@ class Cart
         return $this->getTotalCost() - $this->tax();
     }
 
-    public function __construct(OutputType $checkView)
-    {
-        $this->checkView = $checkView;
-    }
 
     public function addProduct(Product $product, int $qty): void
     {
@@ -66,11 +65,11 @@ class Cart
 
     public function check(): void
     {
-        foreach ($this->products as $product) {
+        foreach ($this->products as $key => $product) {
             $checkView['product'][] = [
                 'title' => $product['product']->getTitle(),
                 'qty' => $product['qty'],
-                'product_sum' => $this->getProductSum($product['product']->getId())
+                'product_sum' => $this->getProductSum($key)
             ];
         }
 
