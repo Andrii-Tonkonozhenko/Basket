@@ -1,11 +1,11 @@
 <?php
 
-class BasketException extends Exception
+class CartException extends Exception
 {
 
 }
 
-class ThisProductIsNotInBasket extends BasketException
+class ThisProductIsNotInCart extends CartException
 {
     protected $message = 'This product is not in the basket';
 }

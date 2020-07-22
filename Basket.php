@@ -4,9 +4,11 @@ require 'Product.php';
 require 'Exception.php';
 require 'OutputType.php';
 
-class Basket
+class Cart
 {
     private $products = [];
+    private $checkView;
+
 
     private function tax(): float
     {
@@ -36,6 +38,11 @@ class Basket
         return $this->getTotalCost() - $this->tax();
     }
 
+    public function __construct(OutputType $checkView)
+    {
+        $this->checkView = $checkView;
+    }
+
     public function addProduct(Product $product, int $qty): void
     {
         $this->products[$product->getId()] = ['product' => $product, 'qty' => $qty];
@@ -44,51 +51,54 @@ class Basket
     public function updateQty(int $id, int $newQty): void
     {
         if (!isset($this->products[$id])) {
-            throw new ThisProductIsNotInBasket();
+            throw new ThisProductIsNotInCart();
         }
         $this->products[$id]['qty'] = $newQty;
     }
 
-    public function removeProduct (int $id): void
+    public function removeProduct(int $id): void
     {
         if (!isset($this->products[$id])) {
-            throw new ThisProductIsNotInBasket();
+            throw new ThisProductIsNotInCart();
         }
         unset($this->products[$id]);
     }
 
-    public function check($type)
+    public function check(): void
     {
-        echo '-----Check-----' . $type;
-        echo 'Date: ' . (date("dS of F  h:I:s A ")) . $type;
-        echo '-----Products-----' . $type;
-
         foreach ($this->products as $product) {
-            echo $product['product']->getTitle() . ' x' . $product['qty'] . ' ' . $this->getProductSum($product['product']->getId()) . '$' . $type;
+            $checkView['product'][] = [
+                'title' => $product['product']->getTitle(),
+                'qty' => $product['qty'],
+                'product_sum' => $this->getProductSum($product['product']->getId())
+            ];
         }
 
-        echo $type . 'Total cost: ' . $this->getTotalCost() . '$' . $type;
-        echo 'Tax: ' . $this->tax() . '$' . $type;
-        echo 'To pay: ' . $this->ToPay() . '$' . $type;
+        $checkView['total_cost'] = $this->getTotalCost();
+        $checkView['tax'] = $this->tax();
+        $checkView['to_pay'] = $this->ToPay();
+
+        $this->checkView->render($checkView);
     }
 
 }
 
-$basket = new Basket();
+$checkView = new HtmlCheckPrinter();
+$cart = new Cart($checkView);
 
 $milk = new Product(1, 'Milk', 1.4);
 $bread = new Product(2, 'Bread', 2.4);
 $meat = new Product(3, 'Meat', 15.5);
 
-$outputType = new OutputType();
-try {
-    $basket->addProduct($milk, 2);
-    $basket->addProduct($bread, 5);
-    $basket->addProduct($meat, 2);
-    $basket->updateQty(1, 6);
-    $basket->removeProduct(3);
 
-    $basket->check($outputType->getOutputBrowser());
-} catch (BasketException $e) {
+try {
+    $cart->addProduct($milk, 2);
+    $cart->addProduct($bread, 5);
+    $cart->addProduct($meat, 2);
+    $cart->updateQty(1, 6);
+    $cart->removeProduct(3);
+    $cart->check();
+} catch (CartException $e) {
     die($e->getMessage());
 }
+
