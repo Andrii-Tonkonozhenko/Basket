@@ -45,7 +45,6 @@ class Cart
             ];
         }
 
-        $checkView['product'] = $this->products;
         $checkView['total_cost'] = $this->cartCalculation->getTotalCost($this->products);
         $checkView['tax'] = $this->cartCalculation->tax($this->products);
         $checkView['to_pay'] = $this->cartCalculation->toPay($this->products);
