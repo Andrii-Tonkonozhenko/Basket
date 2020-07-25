@@ -2,7 +2,6 @@
 
 class CartCalculation
 {
-
     /*
  * @var Product[] $products
     */
