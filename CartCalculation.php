@@ -2,7 +2,11 @@
 
 class CartCalculation
 {
-    public function getTotalCost($products) : float
+
+    /*
+ * @var Product[] $products
+    */
+    public function getTotalCost(array $products) : float
     {
         $totalCost = 0;
 
@@ -13,12 +17,12 @@ class CartCalculation
         return $totalCost;
     }
 
-    public function tax($product) : float
+    public function tax(array $product) : float
     {
        return $this->getTotalCost($product) * (10 / 100);
     }
 
-    public function toPay($product) : float
+    public function toPay(array $product) : float
     {
         return $this->getTotalCost($product) - $this->tax($product);
     }
