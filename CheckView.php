@@ -2,20 +2,22 @@
 
 interface CheckView
 {
-    public function render($data): void;
+    public function render ($data): void;
 }
 
 class HtmlCheckPrinter implements CheckView
 {
-    public function render($data): void
+    public function render( $data): void
     {
-        // так і не поняв куда це.
-        echo '-----Check-----' . '</br>'; //"сам додумаєшся, чому я це заскрінив" провіряй додумався
-        echo 'Date: ' . (date("dS of F  h:I:s A ")) . '</br>';
+        echo '-----Check-----' . '</br>';
+        echo $data['time'] . '</br>';
         echo '-----Products-----' . '</br>';
-        //не вдалося запихнути так як ти хотів, не виходить, абор не правильний синтаксис або логіка.
-        foreach ($data['product'] as $products){
-            echo $products['title'] . ' x'. $products['qty'] . ' ' . $products['product_sum'] . '$' . '</br>';
+
+        /**
+         * @var CartProduct $product
+         */
+        foreach ($data['product'] as $product) {
+            echo $product->getTitle() . ' x'. $product->getQty() . ' ' . $product->getProductSum() . '$' . '</br>';
         }
 
         echo '</br>' . 'Total cost: ' . $data['total_cost'] . '$' . '</br>';
@@ -30,11 +32,14 @@ class ConsoleCheckPrinter implements CheckView
     public function render($data): void
     {
         echo '-----Check-----' . "\n";
-        echo 'Date: ' . (date("dS of F  h:I:s A ")) . "\n";
+        echo $data['time'] . "\n";
         echo '-----Products-----' . "\n";
 
-        foreach ($data['product'] as $products){
-            echo $products['title'] . ' x'. $products['qty'] . ' ' . $products['product_sum'] . '$' . "\n";
+        /**
+         * @var CartProduct $product
+         */
+        foreach ($data['product'] as $product) {
+            echo $product->getTitle() . ' x'. $product->getQty() . ' ' . $product->getProductSum() . '$' . "\n";
         }
 
         echo '</br>' . 'Total cost: ' . $data['total_cost'] . '$' . "\n";

@@ -35,16 +35,8 @@ class Cart
 
     public function check(): void
     {
-
-        //не вдалося запихнути так як ти хотів, не виходить, абор не правильний синтаксис або логіка.
-        foreach ($this->products as $product) {
-            $checkView['product'][] = [
-                'title' => $product->getTitle(),
-                'qty' => $product->getQty(),
-                'product_sum' => $product->getProductSum()
-            ];
-        }
-
+        $checkView['time'] = (date("dS of F  h:I:s A "));
+        $checkView['product'] = $this->products;
         $checkView['total_cost'] = $this->cartCalculation->getTotalCost($this->products);
         $checkView['tax'] = $this->cartCalculation->tax($this->products);
         $checkView['to_pay'] = $this->cartCalculation->toPay($this->products);

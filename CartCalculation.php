@@ -25,5 +25,4 @@ class CartCalculation
     {
         return $this->getTotalCost($product) - $this->tax($product);
     }
-
 }

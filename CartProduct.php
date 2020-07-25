@@ -35,8 +35,5 @@ class CartProduct
     {
         $this->qty = $newQty;
     }
-
-
-
 }
 
